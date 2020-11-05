@@ -17,7 +17,7 @@ namespace Inventory.Functions
             [CosmosDB(
                 databaseName: "Inventory",
                 collectionName: "Orders",
-                ConnectionStringSetting = "CosmosDBConnection")]out dynamic orderDocument,
+                ConnectionStringSetting = "CosmosDBConnection")]out Order orderDocument,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -25,13 +25,10 @@ namespace Inventory.Functions
             string bodyString = reader.ReadToEnd();
             Order data = JsonConvert.DeserializeObject<Order>(bodyString);
             Guid documentId = Guid.NewGuid();
-            orderDocument = new
-            {
-                id = documentId,
-                totalPrice = data.TotalPrice,
-                orderDate = DateTimeOffset.Now,
-                status = "Active"
-            };
+            data.Id = documentId;
+            data.OrderDate = DateTime.Now;
+            data.Status = "Active";
+            orderDocument = data;
             return new OkObjectResult(new
             {
                 id = documentId
